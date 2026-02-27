@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════
+  📧 YAPMAM GEREKEN ADIMLAR - KOPYA YAPISTIR TÜRÜ
+═══════════════════════════════════════════════════════════
+
+🎯 Hepsi 5-10 dakika sürecek. Adım adım takip et.
+
+───────────────────────────────────────────────────────────
+ADIM 1: EmailJS Hesabı Aç (2 dakika)
+───────────────────────────────────────────────────────────
+
+1. Tarayıcıda aç:
+   https://www.emailjs.com/
+
+2. Sağ üst köşede "Sign Up" tıkla
+
+3. "Sign up with Google" seç
+
+4. Gmail hesabını seç: otacilar45.aifanin.kare.kodu@gmail.com
+
+5. "Allow" (İzin Ver) tıkla
+
+✅ BITTI! Artık EmailJS Dashboard'undasın.
+
+───────────────────────────────────────────────────────────
+ADIM 2: Kurulum Web Sayfasını Aç (3 dakika)
+───────────────────────────────────────────────────────────
+
+1. Web sitesini aç:
+   http://localhost:8000
+
+2. Anasayfada aşağı kaydır → "İletişim" bölümünü bul
+
+3. "⚙️ İlk Kullanımda: Kurulum Yap" linkine tıkla
+
+4. Açılan sayfada bu 3 kodu EmailJS'den kopyala + yapıştır:
+
+   1️⃣ PUBLIC KEY
+      → EmailJS Dashboard
+      → Sol menü: Account
+      → Public Key bölümüne bak
+      → Kodu kopyala (o7Uyw... şeklinde başlayan)
+      → Web sitesine yapıştır
+
+   2️⃣ SERVICE ID
+      → EmailJS Dashboard
+      → Sol menü: Email Services
+      → Gmail hizmetini seç
+      → Service ID kopyala (service_abc... şeklinde)
+      → Web sitesine yapıştır
+
+   3️⃣ TEMPLATE ID
+      → EmailJS Dashboard
+      → Sol menü: Email Templates
+      → Yeni template oluştur:
+         * Adı: template_ilac_mesaj
+         * Service: Gmail seç
+         * Kaydet
+      → Template ID'ni kopyala (template_xyz... şeklinde)
+      → Web sitesine yapıştır
+
+5. "KAYDET VE TAMAMLA" butonu tıkla
+
+✅ BITTI! Kodlar kaydedildi.
+
+───────────────────────────────────────────────────────────
+ADIM 3: Test (2 dakika)
+───────────────────────────────────────────────────────────
+
+1. Web sitesine dön (Anasayfa açılmış olmalı)
+
+2. Aşağı kaydır → "İletişim" bölümünü bul
+
+3. Test mesajı gönder:
+   Ad: Test Kullanıcı
+   E-posta: test@example.com
+   Konu: Test Mesajı
+   Mesaj: Bu bir test mesajıdır
+
+4. "Gönder" tıkla
+
+5. Gmail'i aç: otacilar45.aifanin.kare.kodu@gmail.com
+   → Gelen Kutusuna bak
+   → Mesaj var mı?
+
+✅ YEP! Sistem tamamen çalışıyor!
+
+───────────────────────────────────────────────────────────
+HATA VARSA
+───────────────────────────────────────────────────────────
+
+❌ "Kodları bulamadım"
+   → Adım 2'yi baştan başla
+   → Acele etme, belli etli takip et
+   → EmailJS Dashboard'tada mi gördün? Evet mi?
+
+❌ "Mesaj yine gelmiyor"
+   → Kodları doğru kopyaladın mı? (boşluk yok mu?)
+   → F12 tuş → Console sekmesi → Kırmızı yazı var mı?
+   → Baştan adım 2'yi tekrar yap
+
+❌ "Anlamadım"
+   → Whatsapp: Ekran görüntüsü gönder
+   → GitHub: Issue aç
+   → Geliştiriciye sor
+
+───────────────────────────────────────────────────────────
+ÖNEMLİ NOTLAR
+───────────────────────────────────────────────────────────
+
+• Sadece BİR KEZ yapılır
+• Sonra SONSUZA KADAR çalışır
+• Ücretsiz 200 e-posta/ay
+• Gmail hesabı olması gerek (var ✅)
+
+═══════════════════════════════════════════════════════════

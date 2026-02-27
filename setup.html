@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmailJS Setup - İlaç Bilgi Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2563eb;
+        }
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .step h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .step p {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .code-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            background: white;
+        }
+        .code-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .btn {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #065f46;
+            display: none;
+        }
+        .success.show {
+            display: block;
+        }
+        .info-box {
+            background: #e0e7ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .info-box p {
+            color: #2563eb;
+            margin: 0;
+        }
+        .next-step {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .next-step p {
+            color: #92400e;
+            margin: 0;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .video-link {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+        .video-link:hover {
+            background: #1d4ed8;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 E-Posta Kurulumu</h1>
+        <p class="subtitle">3 Kodu Yapıştır → Bitti!</p>
+
+        <div class="info-box">
+            <p>
+                <strong>🌐 Tarayıcıda Aç:</strong> <a href="https://www.emailjs.com/" target="_blank">emailjs.com</a>
+                → <strong>Sign Up with Google</strong> → Gmail seç → İzin ver
+            </p>
+        </div>
+
+        <form onsubmit="saveConfig(event)">
+            <div class="step">
+                <h3><span class="step-number">1</span> Public Key</h3>
+                <p>
+                    Dashboard'ta <strong>Account</strong> → <strong>Public Key</strong> bulunacak. 
+                    Bölümdeki kodu kopyala:
+                </p>
+                <input type="text" id="publicKey" class="code-input" placeholder="o7UywKx4MrzfMWqJO (örnek)" required>
+                <p style="font-size: 0.85rem; color: #999; margin-top: 5px;">💡 "o" harfi ile başlayan uzun kod</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">2</span> Service ID (Gmail)</h3>
+                <p>
+                    Dashboard'ta <strong>Email Services</strong> → <strong>Gmail</strong> → 
+                    Sayfada "Service ID" bölümündeki kodu kopyala:
+                </p>
+                <input type="text" id="serviceId" class="code-input" placeholder="service_abc123def456" required>
+                <p style="font-size: 0.85rem; color: #999; margin-top: 5px;">💡 "service_" ile başlayan kod</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">3</span> Template ID</h3>
+                <p>
+                    Dashboard'ta <strong>Email Templates</strong> → Yeni template oluştur → 
+                    Adı: <code style="background: #f0f0f0; padding: 2px 6px;">template_ilac_mesaj</code> → Kaydet → 
+                    ID'ni kopyala:
+                </p>
+                <input type="text" id="templateId" class="code-input" placeholder="template_xyz789abc" required>
+                <p style="font-size: 0.85rem; color: #999; margin-top: 5px;">💡 "template_" ile başlayan kod</p>
+            </div>
+
+            <button type="submit" class="btn">✅ KAYDET VE TAMAMLA</button>
+
+            <div class="success" id="successMsg">
+                <strong>✅ BASARİLI!</strong>
+                <br><br>
+                Kodlar kaydedildi. Sayı 2 saniye içinde kapanacak...
+                <br><br>
+                <a href="index.html">← Anasayfaya Dön</a>
+            </div>
+        </form>
+
+        <div class="next-step">
+            <p>
+                <strong>Sonra Ne Yapacağız?</strong>
+                <br><br>
+                ✅ Web sitesini aç<br>
+                ✅ İletişim bölümüne git<br>
+                ✅ Test mesajı gönder<br>
+                ✅ Gmail'e mesaj gelecek! 🎉
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function saveConfig(event) {
+            event.preventDefault();
+
+            const publicKey = document.getElementById('publicKey').value.trim();
+            const serviceId = document.getElementById('serviceId').value.trim();
+            const templateId = document.getElementById('templateId').value.trim();
+
+            if (!publicKey || !serviceId || !templateId) {
+                alert('❌ Lütfen tüm alanları doldurunuz!');
+                return;
+            }
+
+            // LocalStorage'a kaydet (tarayıcı belleğinde)
+            localStorage.setItem('emailjs_config', JSON.stringify({
+                publicKey: publicKey,
+                serviceId: serviceId,
+                templateId: templateId
+            }));
+
+            // script.js dosyasını güncellemek için sunucuya gönder
+            // Not: Bu tarayıcıda çalışılamayacak (CORS). 
+            // Alternatif: Manuel script.js düzenlemesi gerekecek
+            
+            // HTML dosyasını güncelle
+            updateScriptFile(publicKey, serviceId, templateId);
+        }
+
+        async function updateScriptFile(publicKey, serviceId, templateId) {
+            try {
+                // API endpoint'e gönder (sunucu kuruluysa)
+                const response = await fetch('/api/update-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        publicKey: publicKey,
+                        serviceId: serviceId,
+                        templateId: templateId
+                    })
+                });
+
+                if (response.ok) {
+                    showSuccess();
+                } else {
+                    manualUpdate(publicKey, serviceId, templateId);
+                }
+            } catch (error) {
+                // Sunucu yoksa, kullanıcıyı manuel yapması için yönlendir
+                manualUpdate(publicKey, serviceId, templateId);
+            }
+        }
+
+        function manualUpdate(publicKey, serviceId, templateId) {
+            // Tarayıcı konsoluna talimatları yazdır
+            const instruction = `
+⚠️ MANUEL GÜNCELLEME GEREKLI:
+
+1. script.js dosyasını metin editörde aç
+2. Bu satırları bul:
+   const PUBLIC_KEY = "...";
+   const SERVICE_ID = "...";
+   const TEMPLATE_ID = "...";
+
+3. Bu değerlerle değiştir:
+   const PUBLIC_KEY = "${publicKey}";
+   const SERVICE_ID = "${serviceId}";
+   const TEMPLATE_ID = "${templateId}";
+
+4. Dosyayı kaydet (Ctrl+S)
+5. Tarayıcıyı yenile (F5)
+            `;
+
+            console.log(instruction);
+            alert(instruction);
+            
+            // Kodları kopyala
+            const configText = `const PUBLIC_KEY = "${publicKey}";
+const SERVICE_ID = "${serviceId}";
+const TEMPLATE_ID = "${templateId}";`;
+            
+            navigator.clipboard.writeText(configText);
+            alert('✅ Kodlar kopyalandı! script.js dosyasında yapıştır');
+            
+            showSuccess();
+        }
+
+        function showSuccess() {
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 3000);
+        }
+
+        // Sayfa yüklediğinde, eğer önceden kaydedilmiş kod varsa göster
+        window.onload = function() {
+            const saved = localStorage.getItem('emailjs_config');
+            if (saved) {
+                const config = JSON.parse(saved);
+                document.getElementById('publicKey').value = config.publicKey;
+                document.getElementById('serviceId').value = config.serviceId;
+                document.getElementById('templateId').value = config.templateId;
+            }
+        };
+    </script>
+</body>
+</html>

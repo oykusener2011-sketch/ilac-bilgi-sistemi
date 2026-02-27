@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kurulum Rehberi - İlaç Bilgi Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #059669;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #059669;
+            padding-bottom: 8px;
+        }
+        .intro {
+            background: #e0e7ff;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .step {
+            background: #f0fdf4;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #22c55e;
+            border-radius: 4px;
+        }
+        .step h3 {
+            color: #15803d;
+            margin-bottom: 8px;
+        }
+        .step p {
+            color: #4b5563;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e11d48;
+            font-weight: 500;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .features-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .btn-back {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .btn-back:hover {
+            background: #1d4ed8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        table th {
+            background: #2563eb;
+            color: white;
+        }
+        table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 İlaç Bilgi Sistemi - Kurulum Rehberi</h1>
+        <p style="color: #666; margin-bottom: 20px;">Hızlı Başlangıç Kılavuzu</p>
+
+        <div class="intro">
+            <strong>👋 Hoş Geldiniz!</strong> Bu rehber, İlaç Bilgi Sistemini kendi bilgisayarınızda çalıştırmanız için adım adım talimatlar içermektedir.
+        </div>
+
+        <div class="section">
+            <h2>📋 Sistem Gereksinimleri</h2>
+            <table>
+                <tr>
+                    <th>Bileşen</th>
+                    <th>Gereksinim</th>
+                    <th>Not</th>
+                </tr>
+                <tr>
+                    <td>İşletim Sistemi</td>
+                    <td>Windows, macOS, Linux</td>
+                    <td>Tamamı desteklenir</td>
+                </tr>
+                <tr>
+                    <td>Web Tarayıcı</td>
+                    <td>Chrome, Firefox, Safari, Edge (Son 2 sürüm)</td>
+                    <td>Sesli okuma için uyumlu olanlar</td>
+                </tr>
+                <tr>
+                    <td>İnternet</td>
+                    <td>QRCode.js kütüphanesi için gerekli</td>
+                    <td>Veya kütüphaneyi lokal olarak yükleyin</td>
+                </tr>
+                <tr>
+                    <td>Kod Editörü</td>
+                    <td>İsteğe bağlı</td>
+                    <td>VS Code, Sublime Text vb.</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ Kurulum Adımları</h2>
+
+            <div class="step">
+                <h3>Adım 1: Dosyaları İndirin</h3>
+                <p>Projenin tüm dosyalarını aynı klasöre kaydedin:</p>
+                <ul class="features-list">
+                    <li><code>index.html</code></li>
+                    <li><code>pharmacist.html</code></li>
+                    <li><code>mobile.html</code></li>
+                    <li><code>styles.css</code></li>
+                    <li><code>script.js</code></li>
+                    <li><code>pharmacist.js</code></li>
+                    <li><code>mobile.js</code></li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h3>Adım 2: Web Sunucusu Başlatın</h3>
+                <p><strong>Seçenek 1: Python ile (3.x sürüm)</strong></p>
+                <div class="code-block">cd /path/to/folder
+python -m http.server 8000</div>
+
+                <p><strong>Seçenek 2: Node.js ile</strong></p>
+                <div class="code-block">npm install -g http-server
+http-server -p 8000</div>
+
+                <p><strong>Seçenek 3: PHP ile</strong></p>
+                <div class="code-block">cd /path/to/folder
+php -S localhost:8000</div>
+
+                <div class="note">
+                    <strong>💡 Not:</strong> Dosyaları doğrudan tarayıcıda açmak (file://) sesli QR kod gibi bazı özellikleri devre dışı bırakabilir. Web sunucusu kullanın.
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Adım 3: Tarayıcıda Açın</h3>
+                <p>Web tarayıcınızda aşağıdaki adresi yazın:</p>
+                <div class="code-block">http://localhost:8000</div>
+
+                <div class="success">
+                    ✅ İlaç Bilgi Sistemi anasayfası görüntülenmelidir.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Test Etme</h2>
+
+            <h3>Eczacı Panelini Test Edin</h3>
+            <div class="step">
+                <p><strong>1.</strong> <a href="pharmacist.html">Eczacı Paneli</a>'ne gidin</p>
+                <p><strong>2.</strong> Aşağıdaki test verilerini girin:</p>
+                <ul>
+                    <li><strong>Hasta Adı:</strong> Ahmet Kaya</li>
+                    <li><strong>İlaç Adı:</strong> Aspirin 500mg</li>
+                    <li><strong>Amacı:</strong> Baş ağrısı ve ateş için</li>
+                    <li><strong>Doz:</strong> 500 mg</li>
+                    <li><strong>Sıklık:</strong> 2 (günde 2 kez)</li>
+                    <li><strong>Süre:</strong> 3 gün</li>
+                </ul>
+                <p><strong>3.</strong> "QR Kod Oluştur" düğmesine tıklayın</p>
+                <p><strong>4.</strong> QR kodu indirin veya yazdırın</p>
+            </div>
+
+            <h3>Mobil Tarayıcıyı Test Edin</h3>
+            <div class="step">
+                <p><strong>1.</strong> <a href="mobile.html">Mobil Tarayıcı</a>'ya gidin</p>
+                <p><strong>2.</strong> Sayfa alt kısmında "🧪 Test Verisi Yükle" düğmesine tıklayın</p>
+                <p><strong>3.</strong> İlaç bilgileri görüntülenecektir</p>
+                <p><strong>4.</strong> "🔊 Tümünü Canlı Oku" düğmesiyle sesli okumayı deneyin</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔊 Sesli Okuma Ayarları</h2>
+
+            <p><strong>Windows:</strong></p>
+            <ul class="features-list">
+                <li>Chrome, Edge, Firefox destekler</li>
+                <li>Sistem sesi açık olmalıdır</li>
+                <li>Dil ayarları: Türkçe (tr-TR)</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>macOS:</strong></p>
+            <ul class="features-list">
+                <li>Safari, Chrome, Firefox destekler</li>
+                <li>Sistem tercihleri &gt; Erişilebilirlik &gt; Konuşma</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>Linux:</strong></p>
+            <ul class="features-list">
+                <li>Chrome/Chromium kullanın</li>
+                <li>Espeak veya Festival kurulu olmalı</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>❓ Sıkça Sorulan Sorular</h2>
+
+            <div class="step">
+                <h3>S: Sesli okuma çalışmıyor, ne yapmalıyım?</h3>
+                <p><strong>C:</strong> Tarayıcınızın ayarlarını kontrol edin:
+                    <ul>
+                        <li>Sistem sesinin açık olduğundan emin olun</li>
+                        <li>Tarayıcı için sesli izin verildiğinden emin olun</li>
+                        <li>Web Speech API'sini destekleyen bir tarayıcı kullanın</li>
+                        <li>Başka bir tarayıcı deneyin</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="step">
+                <h3>S: QR kod taraması çalışmıyor?</h3>
+                <p><strong>C:</strong> Test verilerini kullanabilirsiniz:
+                    <ul>
+                        <li>Mobil sayfasında "🧪 Test Verisi Yükle" düğmesini tıklayın</li>
+                        <li>Veya eczacı panelinde oluşturduğunuz QR kodu manuel olarak girin</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="step">
+                <h3>S: Dosyaları nereye koymalıyım?</h3>
+                <p><strong>C:</strong> Tüm dosyaları aynı klasörede saklayın. Örnek:
+                    <div class="code-block">MyProject/
+├── index.html
+├── pharmacist.html
+├── mobile.html
+├── styles.css
+├── script.js
+├── pharmacist.js
+└── mobile.js</div>
+                </p>
+            </div>
+
+            <div class="step">
+                <h3>S: Yerel ağda diğer cihazlardan erişebilir miyim?</h3>
+                <p><strong>C:</strong> Evet! Web sunucusunu başlatırken:
+                    <div class="code-block">python -m http.server 8000 --bind 0.0.0.0</div>
+                    Daha sonra diğer cihazlardan <code>http://[bilgisayar-ip]:8000</code> ile erişin
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📱 Mobil Cihazda Kullanım</h2>
+
+            <p>Mobil cihazlarda kullanmak için:</p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Web sunucusunu başlatın</li>
+                <li>Mobil cihazda bilgisayarınızın IP adresini girin: <code>http://[IP]:8000</code></li>
+                <li>İçeriyi Giriş Ekranına ekleyin (PWA olarak)</li>
+                <li>Çevrimdışı da kullanılabilir</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>🐛 Sorun Giderme</h2>
+
+            <p><strong>Sayfalar yüklenmiyor:</strong></p>
+            <ul class="features-list">
+                <li>Web sunucusunun çalışıp çalışmadığını kontrol edin</li>
+                <li>Doğru port numarasını kullanıp kullanmadığınızı kontrol edin</li>
+                <li>Dosya adlarını (büyük/küçük harf) kontrol edin</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>Stil yüklenmiyorsa:</strong></p>
+            <ul class="features-list">
+                <li><code>styles.css</code> dosyasının aynı klasörde olduğunu kontrol edin</li>
+                <li>Tarayıcı önbelleğini temizleyin (Ctrl+Shift+Delete)</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>QR kod oluşturulmuyor:</strong></p>
+            <ul class="features-list">
+                <li>İnternet bağlantısını kontrol edin (QRCode.js CDN için)</li>
+                <li>Tarayıcı konsolunda hata olup olmadığını kontrol edin (F12)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🔗 Dosya İndirme Bağlantıları</h2>
+
+            <p>Ana sayfa:</p>
+            <ul class="features-list">
+                <li><a href="index.html">📄 Anasayfa</a></li>
+                <li><a href="pharmacist.html">💊 Eczacı Paneli</a></li>
+                <li><a href="mobile.html">📱 Mobil Tarayıcı</a></li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+            <p style="color: #666; font-size: 0.9rem;">
+                <strong>Başlamaya hazır mısınız?</strong> <a href="index.html" class="btn-back">Anasayfaya Git →</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
