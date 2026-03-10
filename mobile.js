@@ -5,7 +5,18 @@ let isSpeaking = false;
 
 // QR Kod tarayıcı başlat
 document.addEventListener('DOMContentLoaded', function() {
-    initializeScanner();
+    // URL parametrelerini kontrol et (başka cihazdan taranmışsa)
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('data');
+    
+    if (dataParam) {
+        // URL'den gelen veriyi işle (QR kod başka cihazdan tarandı)
+        console.log('URL parametresinden veri alındı');
+        processMedicineData(dataParam);
+    } else {
+        // Normal tarama başlat
+        initializeScanner();
+    }
 });
 
 function initializeScanner() {

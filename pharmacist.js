@@ -66,13 +66,16 @@ async function generateQR(event) {
     const utf8String = unescape(encodeURIComponent(jsonString));
     const encodedData = btoa(utf8String);
 
+    // QR Kodun içine tam URL yazınız (başka cihazdan tarandığında çalışması için)
+    const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/?data=${encodedData}`;
+
     // QR Kod oluştur
     const qrContainer = document.getElementById('qrCodeOutput');
     qrContainer.innerHTML = '';
 
     try {
         const qr = new QRCode(qrContainer, {
-            text: encodedData,
+            text: qrUrl,
             width: 250,
             height: 250,
             correctLevel: QRCode.CorrectLevel.H,
