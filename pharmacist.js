@@ -26,9 +26,6 @@ try {
 let currentSessionId = null;
 let listeningToSession = false;
 
-// Form alanlarını dinle ve ön izle güncelle
-document.getElementById('medicineForm').addEventListener('input', updatePreview);
-
 function updatePreview() {
     const patientName = document.getElementById('patientName').value;
     const medicineName = document.getElementById('medicineName').value;
@@ -260,6 +257,15 @@ function copyEncodedData() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Eczacı Paneli Hazır');
     updatePreview();
+    
+    // Form alanlarını dinle ve ön izle güncelle
+    const form = document.getElementById('medicineForm');
+    if (form) {
+        form.addEventListener('input', updatePreview);
+        console.log('Form listener bağlandı');
+    } else {
+        console.error('medicineForm elementi bulunamadı!');
+    }
 });
 
 // Firebase'den gelen veriyi seslendir
