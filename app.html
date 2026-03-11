@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlaç Bilgi Sistemi - Tek Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tabs-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        
+        .tabs-header {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: #f3f4f6;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-button:hover {
+            background: #e5e7eb;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #1f2937;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .tab-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>💊 İlaç Bilgi Sistemi</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Anasayfa</a></li>
+                <li><a href="app.html" class="active">Uygulama</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container tabs-container">
+        <div class="tabs-header">
+            <button class="tab-button active" onclick="switchTab('qr-create')">
+                📝 QR Oluştur (Eczacı)
+            </button>
+            <button class="tab-button" onclick="switchTab('qr-scan')">
+                📱 QR Tara (Hasta)
+            </button>
+        </div>
+
+        <!-- TAB 1: QR OLUŞTUR -->
+        <div id="qr-create" class="tab-content active">
+            <div class="pharmacist-panel">
+                <h1>QR Kod Oluşturma Paneli</h1>
+                <p class="subtitle">İlaç bilgilerini girerek QR kod oluşturun</p>
+
+                <div class="panel-layout">
+                    <div class="form-section">
+                        <h2>İlaç Bilgilerini Girin</h2>
+                        <form id="medicineForm" onsubmit="generateQR(event)">
+                            <div class="form-group">
+                                <label for="patientName">Reçete Sahibinin Adı *</label>
+                                <input type="text" id="patientName" name="patientName" required>
+                                <small>İlacı alacak kişinin adı</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="medicineName">İlacın Adı *</label>
+                                <input type="text" id="medicineName" name="medicineName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="purpose">Endikasyon *</label>
+                                <textarea id="purpose" name="purpose" rows="3" required></textarea>
+                                <small>Örn: Baş ağrısı ve ateş düşürmek için</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dosage">Kullanım Dozu *</label>
+                                <input type="text" id="dosage" name="dosage" placeholder="Örn: 500 mg, 1 tablet" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="frequency">Kullanım Periyodu *</label>
+                                <textarea id="frequency" name="frequency" rows="2" required placeholder="Örn: Günde 2 kez, 7 gün süreyle"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="specialCondition">Özel Durum</label>
+                                <textarea id="specialCondition" name="specialCondition" rows="3" placeholder="Örn: Hamilelik, emzirme, böbrek hastalığı, ilaç alerjisi vb."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large">QR Kod Oluştur</button>
+                        </form>
+                    </div>
+
+                    <div class="preview-section">
+                        <h2>İlaç Bilgisi Ön İzlemesi</h2>
+                        <div id="preview" class="preview-content">
+                            <p style="color: #999; text-align: center;">Form alanlarını doldurdukça ön izleme güncellenecektir</p>
+                        </div>
+
+                        <div id="qrCode" class="qr-code-container" style="display: none;">
+                            <h3>Oluşturulan QR Kod</h3>
+                            <div id="qrCodeOutput"></div>
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-secondary" onclick="downloadQR()">QR Kodu İndir</button>
+                                <button class="btn btn-secondary" onclick="printQR()" style="margin-left: 0.5rem;">QR Kodu Yazdır</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: QR TARA -->
+        <div id="qr-scan" class="tab-content">
+            <div class="mobile-scanner">
+                <h1>İlaç Bilgisini Sesli Olarak Öğren</h1>
+
+                <div class="scanner-layout">
+                    <div class="scanner-section">
+                        <h2>QR Kod Taraması</h2>
+                        <div class="camera-container">
+                            <div id="scanner" style="width: 100%; position: relative;"></div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 8px; display: block; visibility: visible; opacity: 1;">
+                            <label for="cameraSelect" style="display: block; font-weight: bold; margin-bottom: 0.5rem; color: #333;">
+                                📷 Kamera Seçin:
+                            </label>
+                            <select id="cameraSelect" style="width: 100%; padding: 0.75rem; border-radius: 4px; border: 1px solid #999; font-size: 1rem; background-color: white; color: #333; display: block;">
+                                <option value="">⏳ Kameralar yükleniyor...</option>
+                            </select>
+                            <small style="display: block; margin-top: 0.5rem; color: #666;">2+ kameralı cihazlarda kameraları seçebilirsiniz</small>
+                        </div>
+                        </div>
+                        <div class="scanner-instructions">
+                            <p>📱 Kameranız açılırsa, QR kodu kare şekli içine getirin</p>
+                            <p>🔊 Tarama başarılı olduğunda bilgiler otomatik olarak seslendirilecektir</p>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h2>İlaç Bilgileri</h2>
+                        <div id="medicineInfo" class="medicine-info">
+                            <p style="color: #999; text-align: center;">QR Kod taradıktan sonra bilgiler burada görüntülenecektir</p>
+                        </div>
+
+                        <div class="audio-controls" id="audioControls" style="display: none;">
+                            <h3>Ses Kontrolleri</h3>
+                            <div class="button-group">
+                                <button class="btn btn-secondary" onclick="speakAllInfo()">🔊 Tümünü Canlı Oku</button>
+                                <button class="btn btn-secondary" onclick="stopSpeaking()">⏹️ Dur</button>
+                                <button class="btn btn-secondary" onclick="toggleVolume()">🔇 Sesi Aç/Kapat</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 İlaç Bilgi Sistemi. Erişilebilir Sağlıklı Yaşam İçin.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
