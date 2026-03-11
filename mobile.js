@@ -234,8 +234,11 @@ function startQRScanner(scannerDiv) {
             console.log('✅ QR Scanner başarıyla başlatıldı - Tarama aktif');
             console.log('💡 İpucu: QR kodu kamera karesi içine getirin ve iyi aydınlık sağlayın');
             
-            // Kamera listesini yükle
-            loadAvailableCameras();
+            // Kamera listesini 1 saniye sonra yükle (render bitildikten sonra)
+            setTimeout(() => {
+                console.log('📷 Kamera listesi yükleniyor...');
+                loadAvailableCameras();
+            }, 1000);
             
         } catch (renderError) {
             console.error('Render hatası:', renderError);
@@ -511,6 +514,13 @@ function speakAllInfo() {
         return;
     }
 
+    // Web Speech API desteği kontrol et
+    if (!('speechSynthesis' in window)) {
+        console.error('❌ Bu tarayıcı Web Speech API desteklemiyor');
+        alert('⚠️ Tarayıcınız sesli okuma (TTS) özelliğini desteklemiyor. Lütfen Chrome, Edge veya Firefox kullanınız.');
+        return;
+    }
+
     // Ses tarayıcı tarafından durdurulmuşsa temizle
     if (isSpeaking) {
         window.speechSynthesis.cancel();
@@ -532,25 +542,42 @@ function speakAllInfo() {
     // Web Speech API kullanarak seslendir
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'tr-TR';
-    utterance.rate = 0.9; // Daha yavaş konuş
+    utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
 
     utterance.onstart = function() {
         isSpeaking = true;
-        console.log('Metin seslendirilmeye başlandı');
+        console.log('🔊 Metin seslendirilmeye başlandı');
     };
 
     utterance.onend = function() {
         isSpeaking = false;
-        console.log('Metin seslendirilme tamamlandı');
+        console.log('✅ Metin seslendirilme tamamlandı');
     };
 
     utterance.onerror = function(event) {
-        console.error('Konuşma hatası:', event);
-        alert('Sesli okuma başarısız oldu. Lütfen tarayıcınızın ayarlarını kontrol ediniz.');
+        isSpeaking = false;
+        console.error('❌ Konuşma hatası:', event.error);
+        
+        // Farklı hata türlerine göre mesaj ver
+        let errorMsg = event.error;
+        if (event.error === 'no-speech') {
+            errorMsg = 'Ses bulunamadı';
+        } else if (event.error === 'audio-busy') {
+            errorMsg = 'Ses cihazı meşgul';
+        } else if (event.error === 'not-allowed') {
+            errorMsg = 'Ses okuma izni verilmedi';
+        } else if (event.error === 'network') {
+            errorMsg = 'Ağ bağlantısı sorunları - internet bağlantınızı kontrol edin';
+        }
+        
+        console.error('Hata detayı:', errorMsg);
+        alert(`⚠️ Sesli okuma başarısız oldu: ${errorMsg}\n\nÇözümler:\n- Tarayıcıyı yenileyin\n- İnternet bağlantısını kontrol edin\n- Chrome/Edge/Firefox kullanın`);
     };
 
+    console.log('🔊 Sesli okuma başlatılıyor... lang:', utterance.lang, 'rate:', utterance.rate);
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
 }
 

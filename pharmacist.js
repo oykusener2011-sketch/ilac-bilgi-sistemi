@@ -303,6 +303,13 @@ function playReceivedData(data) {
 function speakMedicineInfo(data) {
     if (!data) return;
     
+    // Web Speech API desteği kontrol et
+    if (!('speechSynthesis' in window)) {
+        console.error('❌ Bu tarayıcı Web Speech API desteklemiyor');
+        alert('⚠️ Tarayıcınız sesli okuma (TTS) özelliğini desteklemiyor. Lütfen Chrome, Edge veya Firefox kullanınız.');
+        return;
+    }
+    
     // Türkçe seslendir
     const text = `
         Reçete Sahibinin Adı: ${data.patientName}. 
@@ -318,6 +325,38 @@ function speakMedicineInfo(data) {
     utterance.rate = 0.9;
     utterance.pitch = 1;
     
-    window.speechSynthesis.cancel();
+    // Hata handling ekle
+    utterance.onerror = function(event) {
+        console.error('❌ Sesli okuma hatası:', event.error);
+        console.error('Hata tipi:', event.error);
+        
+        // Farklı hata türlerine göre mesaj ver
+        let errorMsg = event.error;
+        if (event.error === 'no-speech') {
+            errorMsg = 'Ses bulunamadı';
+        } else if (event.error === 'audio-busy') {
+            errorMsg = 'Ses cihazı meşgul';
+        } else if (event.error === 'not-allowed') {
+            errorMsg = 'Ses okuma izni verilmedi';
+        } else if (event.error === 'network') {
+            errorMsg = 'Ağ bağlantısı sorunları - lütfen internet bağlantınızı kontrol edin';
+        }
+        
+        alert(`⚠️ Sesli okuma başarısız oldu: ${errorMsg}\n\nLütfen tarayıcı ayarlarını kontrol ediniz veya sayfa yenileyin.`);
+        document.getElementById('audioControls').style.display = 'none';
+    };
+    
+    // Başarılı tamamlama
+    utterance.onend = function() {
+        console.log('✅ Sesli okuma tamamlandı');
+    };
+    
+    // Başlama
+    utterance.onstart = function() {
+        console.log('🔊 Sesli okuma başlatıldı');
+    };
+    
+    console.log('🔊 Sesli okuma başlatılıyor... lang:', utterance.lang, 'rate:', utterance.rate);
+    window.speechSynthesis.cancel(); // Önceki sesleri iptal et
     window.speechSynthesis.speak(utterance);
 }
