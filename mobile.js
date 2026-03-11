@@ -1,17 +1,62 @@
 // Mobil QR Kod Tarayıcı JavaScript
 
+// Firebase Konfigürasyonu
+const firebaseConfig = {
+  apiKey: "AIzaSyC34zHTXKJHtEJ0LduOwV2bnWEeeV2sAK8",
+  authDomain: "ilac-bilgi-sistemi-53238.firebaseapp.com",
+  databaseURL: "https://ilac-bilgi-sistemi-53238-default-rtdb.firebaseio.com",
+  projectId: "ilac-bilgi-sistemi-53238",
+  storageBucket: "ilac-bilgi-sistemi-53238.firebasestorage.app",
+  messagingSenderId: "1057703306085",
+  appId: "1:1057703306085:web:298b723fb9c41bc454778c"
+};
+
+// Firebase Başlat
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const database = firebase.database();
+
 let currentMedicineData = null;
 let isSpeaking = false;
 
 // QR Kod tarayıcı başlat
 document.addEventListener('DOMContentLoaded', function() {
-    // URL parametrelerini kontrol et (başka cihazdan taranmışsa)
+    // URL parametrelerini kontrol et
     const urlParams = new URLSearchParams(window.location.search);
+    const sessionParam = urlParams.get('session');
     const dataParam = urlParams.get('data');
     
-    if (dataParam) {
-        // URL'den gelen veriyi işle (QR kod başka cihazdan tarandı)
-        console.log('URL parametresinden veri alındı');
+    if (sessionParam) {
+        // Session modunda - Eczacının paneli dinliyor
+        console.log('Session mode:', sessionParam);
+        console.log('Eczacı paneli verilerini bekliyor...');
+        
+        // Simüle veri göster (test amaçlı)
+        const testData = {
+            patientName: 'Test Hastası',
+            medicineName: 'Test İlacı',
+            purpose: 'Test endikasyonu',
+            dosage: 'Test dozu',
+            frequency: 'Test periyodu',
+            specialCondition: 'Test notu'
+        };
+        
+        displayMedicineInfo(testData);
+        
+        // Eczacı üretilen veriyi göfrenin diye bekle (mesaj göster)
+        let messageHTML = `
+            <div style="background: #fef3c7; padding: 2rem; border-radius: 8px; text-align: center; margin-top: 2rem;">
+                <p style="font-size: 1.2rem; font-weight: bold;  color: #92400e;">⏳ Eczacı panelinden veri bekleniyor...</p>
+                <p style="color: #b45309; margin-top: 1rem;">Eczacı panelinde QR kodu tarandıktan sonra buraya bilgiler gelecektir.</p>
+                <p style="font-size: 0.9rem; color: #92400e; margin-top: 1rem; font-family: monospace;">Session: ${sessionParam}</p>
+            </div>
+        `;
+        document.getElementById('medicineInfo').innerHTML = messageHTML;
+        
+    } else if (dataParam) {
+        // Eski data modunda - doğrudan veri içinde
+        console.log('Data mode:', dataParam.substring(0, 50) + '...');
         processMedicineData(dataParam);
     } else {
         // Normal tarama başlat

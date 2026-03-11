@@ -1,5 +1,23 @@
 // Eczacı Paneli JavaScript
 
+// Firebase Konfigürasyonu
+const firebaseConfig = {
+  apiKey: "AIzaSyC34zHTXKJHtEJ0LduOwV2bnWEeeV2sAK8",
+  authDomain: "ilac-bilgi-sistemi-53238.firebaseapp.com",
+  databaseURL: "https://ilac-bilgi-sistemi-53238-default-rtdb.firebaseio.com",
+  projectId: "ilac-bilgi-sistemi-53238",
+  storageBucket: "ilac-bilgi-sistemi-53238.firebasestorage.app",
+  messagingSenderId: "1057703306085",
+  appId: "1:1057703306085:web:298b723fb9c41bc454778c"
+};
+
+// Firebase Başlat
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+let currentSessionId = null;
+let listeningToSession = false;
+
 // Form alanlarını dinle ve ön izle güncelle
 document.getElementById('medicineForm').addEventListener('input', updatePreview);
 
@@ -67,9 +85,35 @@ async function generateQR(event) {
     const encodedData = btoa(utf8String);
 
     // QR Kodun içine tam URL yazınız (başka cihazdan tarandığında çalışması için)
-    const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/?data=${encodedData}`;
+    // Unique Session ID oluştur
+    currentSessionId = 'SESSION_' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    console.log('Session ID oluşturuldu:', currentSessionId);
+    
+    const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/?session=${currentSessionId}`;
 
-    // QR Kod oluştur
+    // Firebase'e session'ı oluştur
+    try {
+        await database.ref('sessions/' + currentSessionId).set({
+            createdAt: new Date().toISOString(),
+            status: 'waiting',
+            medicineData: medicineData
+        });
+        console.log('Firebase Session oluşturuldu');
+    } catch (error) {
+        console.error('Firebase hatası:', error);
+    }
+
+    // Firebase'i dinlemeye başla - telefon veri yazınca seslendir
+    if (!listeningToSession) {
+        listeningToSession = true;
+        database.ref('sessions/' + currentSessionId + '/medicineData').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const receivedData = snapshot.val();
+                console.log('📱 Telefon veri gönderdi:', receivedData);
+                playReceivedData(receivedData);
+            }
+        });
+    }
     const qrContainer = document.getElementById('qrCodeOutput');
     qrContainer.innerHTML = '';
 
@@ -89,7 +133,7 @@ async function generateQR(event) {
         document.getElementById('encodedDataDisplay').value = encodedData;
 
         // Başarı mesajı
-        alert('✅ QR Kod başarıyla oluşturulmuştur! Lütfen kodu indirin veya yazdırın.');
+        alert(`✅ QR Kod başarıyla oluşturuldu!\n\nSession ID: ${currentSessionId}\n\nTelefondan QR tarandığında burada sesli bilgi görüntülenecektir.`);
 
         // Ekran okuyucu için ilan
         const announcement = document.createElement('div');
@@ -199,3 +243,50 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Eczacı Paneli Hazır');
     updatePreview();
 });
+
+// Firebase'den gelen veriyi seslendir
+function playReceivedData(data) {
+    if (!data) return;
+    
+    console.log('Seslendirilecek veri:', data);
+    
+    // Veriyi ekranda göster
+    let displayHTML = `
+        <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; border: 2px solid #10b981;">
+            <h3 style="color: #059669; margin-top: 0;">📱 Telefon Veri Gönderdi!</h3>
+            <p><strong>👤 Hasta Adı:</strong> ${escapeHtml(data.patientName || 'N/A')}</p>
+            <p><strong>💊 İlaç Adı:</strong> ${escapeHtml(data.medicineName || 'N/A')}</p>
+            <p><strong>🏥 Endikasyon:</strong> ${escapeHtml(data.purpose || 'N/A')}</p>
+            <p><strong>📏 Kullanım Dozu:</strong> ${escapeHtml(data.dosage || 'N/A')}</p>
+            <p><strong>⏰ Kullanım Periyodu:</strong> ${escapeHtml(data.frequency || 'N/A')}</p>
+            ${data.specialCondition ? `<p><strong>⚠️ Özel Durum:</strong> ${escapeHtml(data.specialCondition)}</p>` : ''}
+        </div>
+    `;
+    document.getElementById('preview').innerHTML = displayHTML;
+    
+    // Sesle oku
+    speakMedicineInfo(data);
+}
+
+// İlaç bilgilerini sesle oku
+function speakMedicineInfo(data) {
+    if (!data) return;
+    
+    // Türkçe seslendir
+    const text = `
+        Reçete Sahibinin Adı: ${data.patientName}. 
+        İlacın Adı: ${data.medicineName}. 
+        Endikasyon: ${data.purpose}. 
+        Kullanım Dozu: ${data.dosage}. 
+        Kullanım Periyodu: ${data.frequency}. 
+        ${data.specialCondition ? `Özel Durum: ${data.specialCondition}.` : ''}
+    `;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'tr-TR';
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+}
