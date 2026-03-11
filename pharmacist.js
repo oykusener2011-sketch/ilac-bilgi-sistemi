@@ -13,14 +13,21 @@ const firebaseConfig = {
 
 // Firebase Başlat
 let database = null;
+let firebaseReady = false;
+
 try {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    database = firebase.database();
+    firebaseReady = true;
+    console.log('✅ Firebase başarıyla başlatıldı');
+  } else {
+    console.error('❌ Firebase SDK yüklenmedi - window.firebase tanınmıyor');
   }
-  database = firebase.database();
-  console.log('Firebase başarıyla başlatıldı');
 } catch (error) {
-  console.warn('Firebase başlatılması başarısız:', error);
+  console.error('❌ Firebase başlatılması başarısız:', error);
 }
 
 let currentSessionId = null;
