@@ -12,10 +12,16 @@ const firebaseConfig = {
 };
 
 // Firebase Başlat
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+let database = null;
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  database = firebase.database();
+  console.log('Firebase başarıyla başlatıldı');
+} catch (error) {
+  console.warn('Firebase başlatılması başarısız:', error);
 }
-const database = firebase.database();
 
 let currentMedicineData = null;
 let isSpeaking = false;

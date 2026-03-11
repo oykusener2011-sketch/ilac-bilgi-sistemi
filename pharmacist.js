@@ -12,8 +12,16 @@ const firebaseConfig = {
 };
 
 // Firebase Başlat
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+let database = null;
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  database = firebase.database();
+  console.log('Firebase başarıyla başlatıldı');
+} catch (error) {
+  console.warn('Firebase başlatılması başarısız:', error);
+}
 
 let currentSessionId = null;
 let listeningToSession = false;
@@ -52,6 +60,7 @@ function updatePreview() {
 // QR Kod oluştur
 async function generateQR(event) {
     event.preventDefault();
+    console.log('QR oluşturma başlangıç...');
 
     const patientName = document.getElementById('patientName').value.trim();
     const medicineName = document.getElementById('medicineName').value.trim();
@@ -83,37 +92,45 @@ async function generateQR(event) {
     // Base64 şifrele (UTF-8 desteği ile)
     const utf8String = unescape(encodeURIComponent(jsonString));
     const encodedData = btoa(utf8String);
+    console.log('Veri Base64 şifresi yapıldı');
 
-    // QR Kodun içine tam URL yazınız (başka cihazdan tarandığında çalışması için)
     // Unique Session ID oluştur
     currentSessionId = 'SESSION_' + Math.random().toString(36).substr(2, 9).toUpperCase();
     console.log('Session ID oluşturuldu:', currentSessionId);
     
     const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/?session=${currentSessionId}`;
+    console.log('QR URL:', qrUrl);
 
-    // Firebase'e session'ı oluştur
-    try {
-        await database.ref('sessions/' + currentSessionId).set({
-            createdAt: new Date().toISOString(),
-            status: 'waiting',
-            medicineData: medicineData
-        });
-        console.log('Firebase Session oluşturuldu');
-    } catch (error) {
-        console.error('Firebase hatası:', error);
-    }
+    // Firebase'e session'ı oluştur (ancak başarısız olursa devam et)
+    if (database) {
+        try {
+            await database.ref('sessions/' + currentSessionId).set({
+                createdAt: new Date().toISOString(),
+                status: 'waiting',
+                medicineData: medicineData
+            });
+            console.log('Firebase Session oluşturuldu');
 
-    // Firebase'i dinlemeye başla - telefon veri yazınca seslendir
-    if (!listeningToSession) {
-        listeningToSession = true;
-        database.ref('sessions/' + currentSessionId + '/medicineData').on('value', (snapshot) => {
-            if (snapshot.exists()) {
-                const receivedData = snapshot.val();
-                console.log('📱 Telefon veri gönderdi:', receivedData);
-                playReceivedData(receivedData);
+            // Firebase'i dinlemeye başla - telefon veri yazınca seslendir
+            if (!listeningToSession) {
+                listeningToSession = true;
+                database.ref('sessions/' + currentSessionId + '/medicineData').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const receivedData = snapshot.val();
+                        console.log('📱 Telefon veri gönderdi:', receivedData);
+                        playReceivedData(receivedData);
+                    }
+                });
+                console.log('Firebase dinleyicisi başlangıç');
             }
-        });
+        } catch (error) {
+            console.warn('Firebase hatası (devam ediliyor):', error);
+        }
+    } else {
+        console.warn('Firebase bağlantısı yok');
     }
+
+    // QR Kod oluştur
     const qrContainer = document.getElementById('qrCodeOutput');
     qrContainer.innerHTML = '';
 
@@ -126,6 +143,7 @@ async function generateQR(event) {
             colorDark: '#1f2937',
             colorLight: '#ffffff'
         });
+        console.log('QR Kod başarıyla oluşturuldu');
 
         document.getElementById('qrCode').style.display = 'block';
 
@@ -145,7 +163,7 @@ async function generateQR(event) {
         document.body.appendChild(announcement);
     } catch (error) {
         console.error('QR Kod oluşturulamadı:', error);
-        alert('❌ QR Kod oluşturulurken bir hata meydana geldi. Lütfen tekrar deneyiniz.');
+        alert('❌ QR Kod oluşturulurken bir hata meydana geldi. Lütfen tekrar deneyiniz.\n\nHata: ' + error.message);
     }
 }
 
