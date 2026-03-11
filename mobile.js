@@ -286,11 +286,17 @@ function addTestButton() {
 // Kullanılabilir kameraları listele ve dropdown'ı doldur
 async function loadAvailableCameras() {
     try {
+        console.log('📷 Kameralar yükleniyor...');
         const devices = await Html5Qrcode.getCameras();
-        console.log('📷 Bulunan kameralar:', devices);
+        console.log('✅ Bulunan kameralar:', devices);
+        
+        const select = document.getElementById('cameraSelect');
+        if (!select) {
+            console.error('❌ cameraSelect element bulunamadı!');
+            return;
+        }
         
         if (devices && devices.length > 0) {
-            const select = document.getElementById('cameraSelect');
             select.innerHTML = ''; // Temizle
             
             devices.forEach((device, index) => {
@@ -298,12 +304,9 @@ async function loadAvailableCameras() {
                 option.value = device.id;
                 
                 // Kamera adını belirle
-                let cameraLabel = device.label;
-                if (!cameraLabel || cameraLabel.trim() === '') {
-                    cameraLabel = `Kamera ${index + 1}`;
-                }
+                let cameraLabel = device.label || `Kamera ${index + 1}`;
                 
-                // Ön/arka kamera tahmini (genellikle id'de yazılıdır)
+                // Ön/arka kamera tahmini
                 if (device.id.includes('front') || cameraLabel.toLowerCase().includes('ön')) {
                     cameraLabel = '📱 Ön Kamera - ' + cameraLabel;
                 } else if (device.id.includes('back') || cameraLabel.toLowerCase().includes('arka')) {
@@ -321,28 +324,36 @@ async function loadAvailableCameras() {
                 }
                 
                 select.appendChild(option);
+                console.log(`  ${index + 1}. ${cameraLabel}`);
+            });
+            
+            // Change listener'ı ekle (varsa sil ve yeniden ekle)
+            select.onchange = null;
+            select.addEventListener('change', function() {
+                console.log('🔄 Kamera değiştiriliyor: ' + this.value);
+                if (this.value) {
+                    switchCamera(this.value);
+                }
             });
             
             if (devices.length > 1) {
-                const select = document.getElementById('cameraSelect');
-                select.addEventListener('change', function() {
-                    if (this.value) {
-                        switchCamera(this.value);
-                    }
-                });
-                console.log(`✅ ${devices.length} kamera bulundu, kamera seçim aktif edildi`);
+                console.log(`✅ ${devices.length} kamera bulundu, kamera seçimi AKTİF EDİLDİ`);
+                select.style.display = 'block';
+                select.style.opacity = '1';
             } else {
-                console.log('ℹ️ Sadece 1 kamera bulundu');
+                console.log('ℹ️ Sadece 1 kamera bulundu, dropdown gizlendi');
+                select.style.display = 'none';
             }
         } else {
             console.warn('⚠️ Kamera bulunamadı');
-            const select = document.getElementById('cameraSelect');
             select.innerHTML = '<option value="">Kamera bulunamadı</option>';
         }
     } catch (error) {
-        console.error('❌ Kameara listesi alınamadı:', error);
+        console.error('❌ Kamera listesi alınamadı:', error);
         const select = document.getElementById('cameraSelect');
-        select.innerHTML = '<option value="">Hata: ' + error.message + '</option>';
+        if (select) {
+            select.innerHTML = '<option value="">Hata: ' + error.message + '</option>';
+        }
     }
 }
 
@@ -421,11 +432,24 @@ function loadTestData() {
 function processMedicineData(encodedData) {
     console.log('processMedicineData çağrıldı, veri uzunluğu:', encodedData.length);
     
+    // Eğer gelen veri URL ise, session parametresini al
+    if (encodedData.includes('session=')) {
+        console.log('Session URL tespit edildi, session parametresi çıkartılıyor...');
+        const urlParams = new URLSearchParams(new URL(encodedData).search);
+        const sessionParam = urlParams.get('session');
+        if (sessionParam) {
+            console.log('✅ Session parametresi bulundu:', sessionParam);
+            // Session URL'i, normal tarama gibi ele al - firebase dinleyicisi başlasın
+            window.location.href = encodedData;
+            return;
+        }
+    }
+    
     try {
         // Base64 dekodla (UTF-8 desteği ile)
         console.log('Base64 dekodu başlatılıyor...');
         const jsonString = decodeURIComponent(escape(atob(encodedData)));
-        console.log('Dekodan sonra veri:', jsonString.substring(0, 100) + '...');
+        console.log('✅ Dekodan sonra veri:', jsonString.substring(0, 100) + '...');
         
         const medicineData = JSON.parse(jsonString);
         console.log('✅ Veri başarıyla işlendi:', medicineData);
@@ -433,8 +457,8 @@ function processMedicineData(encodedData) {
         displayMedicineInfo(medicineData);
     } catch (error) {
         console.error('❌ Veri işlenirken hata:', error);
-        console.error('Kodlanmış veri:', encodedData.substring(0, 100) + '...');
-        alert('❌ QR Kod okundu, fakat veri işlenirken hata oluştu. Manuel giriş bölümünü kullanınız.');
+        console.error('Kodlanmış veri:', encodedData.substring(0, 150));
+        alert('❌ QR Kod okundu, fakat veri işlenirken hata oluştu. Lütfen sayfayı yenileyin.');
     }
 }
 

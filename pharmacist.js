@@ -284,7 +284,7 @@ function playReceivedData(data) {
     // Veriyi ekranda göster
     let displayHTML = `
         <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; border: 2px solid #10b981;">
-            <h3 style="color: #059669; margin-top: 0;">📱 Telefon Veri Gönderdi!</h3>
+            <h3 style="color: #059669; margin-top: 0;">✅ İlaç Bilgileri Alındı</h3>
             <p><strong>👤 Hasta Adı:</strong> ${escapeHtml(data.patientName || 'N/A')}</p>
             <p><strong>💊 İlaç Adı:</strong> ${escapeHtml(data.medicineName || 'N/A')}</p>
             <p><strong>🏥 Endikasyon:</strong> ${escapeHtml(data.purpose || 'N/A')}</p>
