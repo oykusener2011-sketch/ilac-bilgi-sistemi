@@ -95,7 +95,7 @@ async function generateQR(event) {
     currentSessionId = 'SESSION_' + Math.random().toString(36).substr(2, 9).toUpperCase();
     console.log('Session ID oluşturuldu:', currentSessionId);
     
-    const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/?session=${currentSessionId}`;
+    const qrUrl = `https://oykusener2011-sketch.github.io/ilac-bilgi-sistemi/mobile.html?session=${currentSessionId}`;
     console.log('QR URL:', qrUrl);
 
     // Firebase'e session'ı oluştur (ancak başarısız olursa devam et)

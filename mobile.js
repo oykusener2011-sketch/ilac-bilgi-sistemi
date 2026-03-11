@@ -25,6 +25,7 @@ try {
 
 let currentMedicineData = null;
 let isSpeaking = false;
+let html5scanner = null;  // Global scanner instance kamera seçim için
 
 // QR Kod tarayıcı başlat
 document.addEventListener('DOMContentLoaded', function() {
@@ -36,29 +37,41 @@ document.addEventListener('DOMContentLoaded', function() {
     if (sessionParam) {
         // Session modunda - Eczacının paneli dinliyor
         console.log('Session mode:', sessionParam);
-        console.log('Eczacı paneli verilerini bekliyor...');
+        console.log('Firebase dinleyicisi başlatılıyor...');
         
-        // Simüle veri göster (test amaçlı)
-        const testData = {
-            patientName: 'Test Hastası',
-            medicineName: 'Test İlacı',
-            purpose: 'Test endikasyonu',
-            dosage: 'Test dozu',
-            frequency: 'Test periyodu',
-            specialCondition: 'Test notu'
-        };
-        
-        displayMedicineInfo(testData);
-        
-        // Eczacı üretilen veriyi göfrenin diye bekle (mesaj göster)
+        // Eczacı panelinden veri bekleme mesajı göster
         let messageHTML = `
             <div style="background: #fef3c7; padding: 2rem; border-radius: 8px; text-align: center; margin-top: 2rem;">
-                <p style="font-size: 1.2rem; font-weight: bold;  color: #92400e;">⏳ Eczacı panelinden veri bekleniyor...</p>
-                <p style="color: #b45309; margin-top: 1rem;">Eczacı panelinde QR kodu tarandıktan sonra buraya bilgiler gelecektir.</p>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #92400e;">⏳ Eczacı panelinden veri bekleniyor...</p>
+                <p style="color: #b45309; margin-top: 1rem;">Eczacı panelinde bu QR kodu tarandıktan sonra, reçete bilgileri burada görüntülenecek ve seslendirilecektir.</p>
                 <p style="font-size: 0.9rem; color: #92400e; margin-top: 1rem; font-family: monospace;">Session: ${sessionParam}</p>
             </div>
         `;
         document.getElementById('medicineInfo').innerHTML = messageHTML;
+        
+        // Firebase'den veri dinle
+        if (database) {
+            database.ref('sessions/' + sessionParam + '/medicineData').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const receivedData = snapshot.val();
+                    console.log('✅ Firebase\'den veri alındı:', receivedData);
+                    displayMedicineInfo(receivedData);
+                    speakMedicineInfo(receivedData);
+                } else {
+                    console.log('⏳ Veri henüz gelmedi, bekleniyor...');
+                }
+            }, (error) => {
+                console.error('❌ Firebase dinleyici hatası:', error);
+            });
+        } else {
+            console.error('Firebase bağlantısı yok');
+            document.getElementById('medicineInfo').innerHTML = `
+                <div style="background: #fee2e2; padding: 2rem; border-radius: 8px; text-align: center;">
+                    <p style="color: #991b1b;">❌ Firebase bağlantısı başarısız oldu</p>
+                    <p style="color: #7f1d1d; font-size: 0.9rem; margin-top: 0.5rem;">Lütfen sayfayı yenileyin</p>
+                </div>
+            `;
+        }
         
     } else if (dataParam) {
         // Eski data modunda - doğrudan veri içinde
@@ -185,10 +198,14 @@ function startQRScanner(scannerDiv) {
                 qrbox: { width: 350, height: 350 },
                 rememberLastUsedCamera: true,
                 showTorchButtonIfSupported: true,
-                showZoomSliderIfSupported: true
+                showZoomSliderIfSupported: true,
+                defaultZoomValueIfSupported: 1
             },
             false
         );
+        
+        // Global instance kaydet (kamera seçim için)
+        html5scanner = html5QrcodeScanner;
         
         // Render operasyonunu try-catch ile sarıla
         try {
@@ -208,11 +225,13 @@ function startQRScanner(scannerDiv) {
                 }
             );
             console.log('✅ QR Scanner başarıyla başlatıldı - Tarama aktif');
-            // Console'da tarama aktif olduğunu göster
             console.log('💡 İpucu: QR kodu kamera karesi içine getirin ve iyi aydınlık sağlayın');
+            
+            // Kamera listesini yükle
+            loadAvailableCameras();
+            
         } catch (renderError) {
             console.error('Render hatası:', renderError);
-            // Tarama yine de kullanılabilir
             console.log('Tarama hata ile yüklendi ama çalışabilir');
         }
         
@@ -255,6 +274,125 @@ function addTestButton() {
     testBtn.textContent = '🧪 Test Verisi Yükle';
     testBtn.onclick = loadTestData;
     instructions.appendChild(testBtn);
+}
+
+// Kullanılabilir kameraları listele ve dropdown'ı doldur
+async function loadAvailableCameras() {
+    try {
+        const devices = await Html5Qrcode.getCameras();
+        console.log('📷 Bulunan kameralar:', devices);
+        
+        if (devices && devices.length > 0) {
+            const select = document.getElementById('cameraSelect');
+            select.innerHTML = ''; // Temizle
+            
+            devices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                
+                // Kamera adını belirle
+                let cameraLabel = device.label;
+                if (!cameraLabel || cameraLabel.trim() === '') {
+                    cameraLabel = `Kamera ${index + 1}`;
+                }
+                
+                // Ön/arka kamera tahmini (genellikle id'de yazılıdır)
+                if (device.id.includes('front') || cameraLabel.toLowerCase().includes('ön')) {
+                    cameraLabel = '📱 Ön Kamera - ' + cameraLabel;
+                } else if (device.id.includes('back') || cameraLabel.toLowerCase().includes('arka')) {
+                    cameraLabel = '📷 Arka Kamera - ' + cameraLabel;
+                } else {
+                    cameraLabel = '📷 ' + cameraLabel;
+                }
+                
+                option.textContent = cameraLabel;
+                option.title = `Kamera ID: ${device.id}`;
+                
+                // İlk kamerayı otomatik seç
+                if (index === 0) {
+                    option.selected = true;
+                }
+                
+                select.appendChild(option);
+            });
+            
+            if (devices.length > 1) {
+                const select = document.getElementById('cameraSelect');
+                select.addEventListener('change', function() {
+                    if (this.value) {
+                        switchCamera(this.value);
+                    }
+                });
+                console.log(`✅ ${devices.length} kamera bulundu, kamera seçim aktif edildi`);
+            } else {
+                console.log('ℹ️ Sadece 1 kamera bulundu');
+            }
+        } else {
+            console.warn('⚠️ Kamera bulunamadı');
+            const select = document.getElementById('cameraSelect');
+            select.innerHTML = '<option value="">Kamera bulunamadı</option>';
+        }
+    } catch (error) {
+        console.error('❌ Kameara listesi alınamadı:', error);
+        const select = document.getElementById('cameraSelect');
+        select.innerHTML = '<option value="">Hata: ' + error.message + '</option>';
+    }
+}
+
+// Kamerayı değiştir
+async function switchCamera(deviceId) {
+    try {
+        if (!html5scanner) {
+            console.error('Scanner henüz başlatılmadı');
+            return;
+        }
+        
+        console.log('📷 Kamera değiştiriliyor: ' + deviceId);
+        
+        // Scanner'ı durdur
+        await html5scanner.stop();
+        
+        // QR Container'ı temizle
+        const scannerDiv = document.getElementById('scanner');
+        scannerDiv.innerHTML = '';
+        
+        // Yeni kamera ile başlat
+        try {
+            await html5scanner.start(
+                { facingMode: { exact: deviceId } },
+                { fps: 20, qrbox: { width: 350, height: 350 } },
+                function onScanSuccess(decodedText, decodedResult) {
+                    console.log('✅ QR Kod başarıyla tarandı!');
+                    console.log('QR veri:', decodedText.substring(0, 50) + '...');
+                    html5scanner.pause(true);
+                    processMedicineData(decodedText);
+                },
+                function onScanFailure(error) {
+                    console.debug('Tarama devam ediyor...');
+                }
+            );
+            console.log('✅ Kamera başarıyla değiştirildi');
+        } catch (innerError) {
+            // Fallback: deviceId yerine facingMode kullan
+            console.warn('Device ID ile başlatma başarısız, facingMode kullanılıyor:', innerError);
+            await html5scanner.start(
+                { facingMode: 'environment' },
+                { fps: 20, qrbox: { width: 350, height: 350 } },
+                function onScanSuccess(decodedText, decodedResult) {
+                    console.log('✅ QR Kod başarıyla tarandı!');
+                    html5scanner.pause(true);
+                    processMedicineData(decodedText);
+                },
+                function onScanFailure(error) {
+                    console.debug('Tarama devam ediyor...');
+                }
+            );
+        }
+    } catch (error) {
+        console.error('❌ Kamera değiştirilirken hata:', error);
+        alert('⚠️ Kamera değiştirilirken hata meydana geldi: ' + error.message);
+        location.reload();
+    }
 }
 
 // Test verileri yükle
